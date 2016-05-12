@@ -23,8 +23,10 @@ map.setCurrentCity("南昌");
 var point = new BMap.Point(115.823055, 28.734845);
 map.centerAndZoom(point,18);
 
-var trajectory = [];
-var i = 0;
+var thisTrajectory = [];
+var startpoint = null;
+var nowpoint = null;
+var flag = 0;
 
 var geolocation = new BMap.Geolocation();
 
@@ -33,17 +35,26 @@ function getPos() {
     if (this.getStatus() == BMAP_STATUS_SUCCESS) {
       map.panTo(r.point);
 
-      trajectory[i] = r.point;
-      i++;
+      if (flag == 0) {
+        startpoint = r.point;
+        var marker = new BMap.Marker(r.point);
+        map.addOverlay(marker);
+        thisTrajectory[0] = thisTrajectory[1] = r.point;
+      } else {
+        thisTrajectory[0] = thisTrajectory[1];
+        thisTrajectory[1] = r.point;
+      }
 
-      map.clearOverlays();
-      var marker = new BMap.Marker(r.point);
-      map.addOverlay(marker);
+      flag++;
+      // add a marker every 10 seconds
+      if (flag % 10 == 0) {
+        var marker = new BMap.Marker(r.point);
+        map.addOverlay(marker);
+      }
 
-      var polyline =new BMap.Polyline(trajectory, {strokeColor:"blue", strokeWeight:6});
-      map.addOverlay(polyline);
+      map.addOverlay(new BMap.Polyline(thisTrajectory, {strokeColor:"blue", strokeWeight:6}));
     } else {
-      alert('failed'+this.getStatus());
+      alert('failed:' + this.getStatus());
     }
   })
 }
