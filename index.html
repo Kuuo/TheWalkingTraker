@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Walking Traker</title>
+  <style>
+    body, html, #allmap {width: 100%;height: 100%;overflow: hidden;margin:0;font-family:"微软雅黑";}
+  </style>
+</head>
+
+<body onload="">
+  <div id="allmap"></div>
+</body>
+
+</html>
+
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=GQG3RzsUsGfg9y6bbK2aN9cF4LTB90me"></script>
+<script type="text/javascript">
+var map = new BMap.Map("allmap");
+map.enableScrollWheelZoom();
+map.setCurrentCity("南昌");
+
+var point = new BMap.Point(115.823055, 28.734845);
+map.centerAndZoom(point,18);
+
+var trajectory = [];
+var i = 0;
+
+var geolocation = new BMap.Geolocation();
+
+function getPos() {
+  geolocation.getCurrentPosition(function(r) {
+    if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+      map.panTo(r.point);
+
+      trajectory[i] = r.point;
+      i++;
+
+      map.clearOverlays();
+      var marker = new BMap.Marker(r.point);
+      map.addOverlay(marker);
+
+      var polyline =new BMap.Polyline(trajectory, {strokeColor:"blue", strokeWeight:6});
+      map.addOverlay(polyline);
+    } else {
+      alert('failed'+this.getStatus());
+    }
+  })
+}
+
+setInterval("getPos()", 3000)
+</script>
